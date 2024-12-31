@@ -405,7 +405,6 @@ const handleLogin = async () => {
       const userData = res.data
       if (userData.token) {
         localStorage.setItem('token', userData.token)
-        console.log('Stored token:', userData.token)
       }
       localStorage.setItem('userInfo', JSON.stringify(userData))
       
@@ -415,8 +414,21 @@ const handleLogin = async () => {
         localStorage.removeItem('rememberedUsername')
       }
 
-      ElMessage.success('登录成功')
-      await router.push('/home')
+      // 根据角色类型跳转到对应的页面
+      const roleRouteMap = {
+        admin: '/admin/dashboard',
+        engineer: '/engineer/dashboard',
+        receptionist: '/receptionist/dashboard',
+        customer: '/customer/dashboard'
+      }
+
+      const targetRoute = roleRouteMap[userData.roleType]
+      if (targetRoute) {
+        ElMessage.success('登录成功')
+        await router.push(targetRoute)
+      } else {
+        ElMessage.error('未知的用户角色')
+      }
     } else {
       ElMessage.error(res.message || '登录失败')
     }
